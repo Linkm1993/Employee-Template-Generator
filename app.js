@@ -9,19 +9,21 @@ const OUTPUT_DIR = path.resolve(__dirname, "output")
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
+
 //setting questions for generating employees
 let employeeArray = [];
+
 const questions = [
     {
         type: 'input',
         name: 'teamMemberName',
         message: "What is the team member's name",
     },
-    {
-        type: 'input',
-        name: 'memberID',
-        message: "What is the team member's ID number?"
-    },
+    // {
+    //     type: 'input',
+    //     name: 'memberID',
+    //     message: "What is the team member's ID number?"
+    // },
     {
         type: 'input',
         name: 'email',
@@ -71,15 +73,32 @@ const questions = [
 
 function questionsInq(){
     inquirer.prompt(questions).then(answers => {
-        console.log(answers);
+        // console.log(answers);
 
-        employeeArray.push(answers);
+        if(answers.role === "Manager"){
+            employeeArray.push(new Manager(answers.teamMemberName, employeeArray.length + 1, answers.email, answers.officeNumber))
+        }
+
+        else  if(answers.role === "Engineer"){
+            employeeArray.push(new Engineer(answers.teamMemberName, employeeArray.length + 1, answers.email, answers.github))
+        }
+
+        else  if(answers.role === "Intern"){
+            employeeArray.push(new Intern(answers.teamMemberName, employeeArray.length + 1, answers.email, answers.school))
+        }
 
         if (answers.askAgain) {
             questionsInq()
         }
+        else{
+            console.log(render(employeeArray))
+            fs.writeFile(outputPath, render(employeeArray), error => console.log(error))
+        }
         // console.log(employeeArray)
     });
+
 }
 
 questionsInq()
+
+
